@@ -2,7 +2,97 @@
 
 Real-world examples showing correct token usage across different design scenarios.
 
-## Example 1: Basic Button Component
+## Example 1: Navigation Bar with PERSISTENT Tokens ✨ NEW
+
+### Scenario
+Navigation bar that needs to work on any background (light/dark content, images, etc.)
+
+### Correct Token Usage
+
+**Nav Bar (default state)**:
+```
+Background: theme/nav/background
+            → aliases → persistent/default
+            → aliases → neutral/900 (light mode - dark nav)
+                      → neutral/100 (dark mode - light nav)
+
+Text: content/inverse (text adapts to nav background)
+      → aliases → neutral/0 (light mode)
+                → neutral/900 (dark mode)
+
+Hover State: theme/nav/hover
+             → aliases → persistent/hover
+             → aliases → neutral/800 (light mode)
+                       → neutral/200 (dark mode)
+
+Active Item: theme/nav/active
+             → aliases → persistent/active
+             → aliases → brand/primary (consistent across modes)
+```
+
+**Key Difference from SURFACE:**
+- Nav bar is context-agnostic (works over any background)
+- Uses PERSISTENT instead of SURFACE
+- Inverts in dark mode (dark in light mode, light in dark mode)
+- Text uses content/inverse to adapt to nav background
+
+### Why PERSISTENT?
+
+Nav bar needs to:
+- Float over any content (video, image, light, dark)
+- Maintain high contrast regardless of background
+- Invert automatically in dark mode
+- Work independently of page context
+
+If we used SURFACE:
+- ❌ Light mode page → light surface background
+- ❌ Can't float over light page background (invisible)
+- ❌ No contrast with page content
+
+With PERSISTENT:
+- ✅ Light mode → dark nav (contrasts with light page)
+- ✅ Dark mode → light nav (contrasts with dark page)
+- ✅ Floats over anything and stays visible
+
+---
+
+## Example 2: Toolbar Floating Over Content ✨ NEW
+
+### Scenario
+Floating toolbar that appears over a video or image background
+
+### Correct Token Usage
+
+**Toolbar (default)**:
+```
+Background: persistent/default
+            → neutral/900 (light mode - always dark for contrast)
+            → neutral/100 (dark mode - always light for contrast)
+
+Button (toolbar action):
+  Background: persistent/hover (on hover)
+  Text: content/inverse
+  Icon: icon/inverse
+
+Divider: border/default (adapts to mode)
+```
+
+### Why This Works
+
+The toolbar uses `persistent/default` which:
+- Is always high-contrast (dark on light, light on dark)
+- Doesn't care what's behind it (video, image, content)
+- Automatically inverts when theme changes
+- No hardcoded colors or mode-specific hacks
+
+If we used SURFACE:
+- Light mode: Light background (invisible on light page/image)
+- Dark mode: Dark background (invisible on dark page/video)
+- Doesn't work for floating elements
+
+---
+
+## Example 3: Basic Button Component
 
 ### Scenario
 Creating a primary button with hover and disabled states.
@@ -800,15 +890,36 @@ Hover State: surface/hover
     ↓
 "Is X a UI element property?"
     ├─ YES → "Is it component-specific?"
-    │        ├─ NO (generic) → Use SEMANTICS (surface/*, content/*, status/*, icon/*, border/*)
+    │        ├─ NO (generic) → "Is it a persistent UI element?"
+    │        │                 ├─ YES (nav/toolbar) → Use PERSISTENT
+    │        │                 └─ NO → Use SEMANTICS (surface/*, content/*, status/*, icon/*, border/*)
     │        └─ YES → Use THEME (theme/{component}/...)
     └─ NO → Use CORE (only in token definitions)
 
+"Is this persistent UI?" (Nav bar, toolbar, sidebar that floats independently)
+    ├─ "Can it overlay anything and stay visible?"
+    │  ├─ YES → Use PERSISTENT (persistent/default, persistent/hover, persistent/pressed, persistent/active)
+    │  └─ NO → Use SURFACE (surface/default, surface/raised, surface/hover, surface/pressed)
+
 "Should I create a new token?"
     ├─ "Used by 3+ components?"
-    │  └─ YES → Create at SEMANTICS level
+    │  └─ YES → Create at SEMANTICS level (SURFACE or PERSISTENT)
     ├─ "Component-specific state?"
     │  └─ YES → Create at THEME level
     └─ NO → Reuse existing token
 ```
+
+### SURFACE vs PERSISTENT Quick Ref
+
+**Use SURFACE when:**
+- ✅ Content layer (cards, inputs, modals)
+- ✅ Depends on page/parent background
+- ✅ Light in light mode, dark in dark mode
+- ✅ Can't float independently
+
+**Use PERSISTENT when:**
+- ✅ Chrome layer (nav, toolbars)
+- ✅ Works independently of background
+- ✅ Dark in light mode, light in dark mode
+- ✅ Always maintains high contrast
 

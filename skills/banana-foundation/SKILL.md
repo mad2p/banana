@@ -20,7 +20,7 @@ TIER 1: CORE (Primitives)
 TIER 2: SEMANTICS (Platform-Agnostic)
 ├─ Semantic abstraction of Core
 ├─ Use for text, backgrounds, status, icons, borders
-├─ 7 categories with 44 tokens
+├─ 8 categories with 65 tokens (added PERSISTENT)
 └─ Routes through Core only
 
 TIER 3: THEME (Component-Specific)
@@ -65,20 +65,31 @@ TIER 3: THEME (Component-Specific)
 
 ---
 
-### TIER 2: SEMANTICS (Platform-Agnostic) - 61 Variables
+### TIER 2: SEMANTICS (Platform-Agnostic) - 65 Variables
 
 **Purpose**: Semantic abstraction that decouples from implementation
 
-**7 Main Categories:**
+**8 Main Categories:**
 
-#### SURFACE (7 tokens)
-- `surface/default` - Default backgrounds
+#### SURFACE (6 tokens) - Content Layer
+**Purpose**: Context-dependent backgrounds for content
+- `surface/default` - Page backgrounds, card backgrounds
 - `surface/raised` - Elevated surfaces (cards, panels)
 - `surface/sunken` - Inset surfaces (wells, input fields)
 - `surface/overlay` - Modals, dropdowns, popovers
-- `surface/hover` - Interactive hover state
-- `surface/pressed` - Interactive pressed state
-- `surface/inverse` - Inverse contrast surfaces
+- `surface/hover` - Interactive hover state on content surfaces
+- `surface/pressed` - Interactive pressed state on content surfaces
+
+**Key distinction**: SURFACE tokens follow the page background (light in light mode, dark in dark mode)
+
+#### PERSISTENT (4 tokens) - Context-Agnostic Chrome Layer ✨ NEW
+**Purpose**: UI chrome that works independently of surroundings
+- `persistent/default` - Nav bars, toolbars (float over any background)
+- `persistent/hover` - Interactive hover on context-agnostic UI
+- `persistent/pressed` - Interactive pressed on context-agnostic UI
+- `persistent/active` - Selected/active state on persistent UI
+
+**Key distinction**: PERSISTENT tokens invert in dark mode (dark in light mode, light in dark mode) to maintain high contrast regardless of surroundings
 
 #### STATUS (8 tokens)
 - `status/info` - Information state
@@ -128,13 +139,24 @@ TIER 3: THEME (Component-Specific)
 
 **When to use**:
 - ✅ Text colors (content/*)
-- ✅ Background colors (surface/*)
+- ✅ Background colors (surface/* for content, persistent/* for chrome)
 - ✅ Status indicators (status/*)
 - ✅ Icons (icon/*)
 - ✅ Borders (border/*)
 - ✅ Generic interactive states (interactive/*)
+- ✅ Navigation/toolbar backgrounds (persistent/*)
 
 **Key principle**: Use Semantics as the primary layer for component styling
+
+**Decision: SURFACE vs PERSISTENT**
+- **SURFACE**: Context-dependent (cards, inputs, modals, sidebars, headers, footers)
+  - Follow page background (light in light mode, dark in dark mode)
+  - Use when element depends on parent context
+
+- **PERSISTENT**: Context-agnostic (nav bars, floating toolbars)
+  - Invert in dark mode (dark in light mode, light in dark mode)
+  - Use when element works independently of surroundings
+  - Rule: "Can this overlay anything and stay visible?"
 
 ---
 
@@ -382,10 +404,10 @@ Why: Uses semantic content for text, theme for structure
 ## System Metrics
 
 ### Variables Inventory
-- **Total**: 721 variables
+- **Total**: 725 variables (updated with PERSISTENT)
 - **Core**: 183 variables (primitives)
-- **Semantics**: 61 variables (abstraction layer)
-- **Theme**: 440 variables (component-specific)
+- **Semantics**: 65 variables (abstraction layer - added 4 PERSISTENT tokens)
+- **Theme**: 440 variables (component-specific - updated to use PERSISTENT)
 - **Typography**: 12 variables (fonts)
 - **Layout**: 25 variables (spacing/sizing helpers)
 
@@ -570,6 +592,7 @@ This ensures:
 
 | Date | Version | Changes |
 |---|---|---|
+| Feb 4, 2026 | 2.1 | PERSISTENT category added (4 tokens) for context-agnostic UI chrome, nav/toolbar tokens migrated to PERSISTENT, refined SURFACE category documentation |
 | Feb 4, 2026 | 2.0 | Semantic token expansion (+28 tokens), Theme token migration (321 tokens), deprecated token consolidation (20 tokens removed), 76% semantic coverage achieved |
 | Earlier | 1.0 | Initial token system architecture |
 

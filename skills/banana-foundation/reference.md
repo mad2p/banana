@@ -219,13 +219,13 @@ Core primitive
 
 ## Semantic Token Deep Dive
 
-### SURFACE Category Rationale
+### SURFACE Category Rationale (Content Layer)
 
-**Why 7 surface tokens?**
-- Allows expressing depth and hierarchy
+**Why 6 surface tokens?**
+- Allows expressing depth and hierarchy for content
 - Each serves specific interaction patterns
 - Supports both light and dark modes
-- Future-proof for new surface types
+- Context-dependent (follows page background)
 
 **Surface Hierarchy**:
 ```
@@ -239,12 +239,37 @@ surface/sunken (lowest)
 ```
 
 **When to use each**:
-- `default`: Main page/background
-- `raised`: Cards, panels, lifted elements
-- `sunken`: Input wells, contained spaces
-- `overlay`: Modals, dropdowns, popovers
-- `hover`/`pressed`: Interactive state changes
-- `inverse`: Contrast surfaces (dark theme inversion)
+- `default`: Main page/background, content areas
+- `raised`: Cards, panels, lifted elements, elevated content
+- `sunken`: Input wells, contained spaces, recessed areas
+- `overlay`: Modals, dropdowns, popovers, floating content
+- `hover`/`pressed`: Interactive state changes on content
+
+**Key**: SURFACE follows page background in both modes
+- Light mode: Light colors (neutral/0-200)
+- Dark mode: Dark colors (neutral/950-800)
+- Use for: Cards, inputs, modals, sidebars, headers, footers (context-dependent)
+
+### PERSISTENT Category Rationale ✨ (Chrome Layer)
+
+**Why 4 persistent tokens?**
+- UI chrome that works independently of surroundings
+- Context-agnostic (inverts in dark mode for high contrast)
+- Enables platform-specific adjustments without affecting content
+
+**When to use each**:
+- `default`: Nav bars, toolbars, persistent UI elements
+- `hover`/`pressed`: Interactive state changes on persistent UI
+- `active`: Selected/active state on persistent UI
+
+**Key**: PERSISTENT inverts in dark mode
+- Light mode: Dark colors (neutral/900-700, high contrast)
+- Dark mode: Light colors (neutral/100-300, high contrast)
+- Use for: Navigation bars, floating toolbars (context-agnostic)
+
+**Decision Rule: "Can this element overlay anything and stay visible?"**
+- YES → Use PERSISTENT (nav bar floats over video, image, content, dark page)
+- NO → Use SURFACE (card depends on page background to be visible)
 
 ### CONTENT Category Hierarchy
 
